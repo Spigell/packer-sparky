@@ -1,0 +1,13 @@
+[Unit]
+Description=sparkyd
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/bash  -c 'export PATH="/usr/share/perl6/site/bin:/usr/share/perl6/vendor/bin/:$PATH" ; sparkyd --timeout=60 --root=/srv/sparky/projects'
+Restart=on-abort
+MemoryLimit=400M
+
+[Install]
+WantedBy=multi-user.target
+

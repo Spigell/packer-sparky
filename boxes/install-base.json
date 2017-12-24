@@ -1,0 +1,98 @@
+[ 
+    { 
+      "plugin" : "disk-partitioner", 
+      "task" : "create gpt table via [plg] disk-partitioner", 
+      "data" : 
+        { "table" : { 
+            "recreate" : "true", 
+            "type" : "gpt", 
+            "target" : "/dev/sda" 
+          } 
+        } 
+    }, 
+    { 
+      "plugin" : "disk-partitioner", 
+      "task" : "make main partition via [plg] disk-partitioner", 
+      "data" : 
+        { "partition" : { 
+            "start" : "2Mib", 
+            "end" : "30Gib", 
+            "type" : "primary", 
+            "flags" : "lvm", 
+            "target" : "/dev/sda" 
+          } 
+        } 
+    }, 
+    { 
+      "plugin" : "disk-partitioner", 
+      "task" : "make boot partition via [plg] disk-partitioner", 
+      "data" : 
+        { "partition" : { 
+           "fs" : {
+              "type" : "fat32"
+                  },
+              "start" : "30Gib", 
+              "end" : "30922Mib", 
+              "flags" : "bios_grub", 
+              "target" : "/dev/sda" 
+          } 
+        } 
+    }, 
+    { 
+      "plugin" : "lvm", 
+      "task" : "create main lv via [plg] lvm", 
+      "data" : 
+        { 
+          "fs" : { 
+              "type" : "ext4" 
+           }, 
+          "partition" : "/dev/sda1", 
+          "lv" : "slashroot", 
+          "vg" : "vg_main", 
+          "size" : "25GB", 
+          "action" : "create" 
+        } 
+    }, 
+    {  
+      "plugin" : "archlinux-install", 
+      "task" : "Install Archlinux via [plg] archlinux-install", 
+      "data" : 
+         { 
+           "hostname" : "archlinux-sparky", 
+           "timezone" : "Europe/Moscow", 
+           "rootpw" : "vagrant", 
+           "locales" : 
+             { 
+               "default" : "en_US.UTF-8" 
+             }, 
+           "mirrorlist" : 
+             { 
+               "servers" : "http://mirror.yandex.ru/archlinux/$repo/os/$arch" 
+             }, 
+           "disk" : 
+             { 
+               "lvm" : 
+               { 
+                 "lv" : "slashroot", 
+                 "vg" : "vg_main" 
+               } 
+             }, 
+           "bootloader" : 
+             { 
+               "grub" : 
+                 {   
+                   "type" : "bios", 
+                   "target" : "/dev/sda" 
+                 } 
+             },
+           "packages" : 
+             { 
+               "installed" : [  "openssh", "sudo" ] 
+             }, 
+           "services" : 
+             { 
+               "enabled" : [ "sshd", "dhcpcd" ] 
+             }
+         }
+     }
+]

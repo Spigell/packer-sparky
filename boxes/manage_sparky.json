@@ -1,0 +1,73 @@
+[
+  {
+     "plugin" : "rakudo-install", 
+     "task" : "install rakudo", 
+     "data" : 
+       { 
+       } 
+  }, 
+  {
+     "plugin" : "yaourt-install",
+     "task" : "install yaourt",
+     "data" :
+       {
+       }
+  },
+  {
+     "plugin" : "bash",
+     "task" : "install zef",
+     "data" :
+       {
+         "command" : "yaourt --noconfirm -S zef",
+         "user" : "vagrant"
+       }
+  },
+  {
+     "plugin" : "bash",
+     "task" : "install Sparky",
+     "data" :
+       {
+         "command" : "zef install --/test --debug Sparky",
+         "envvars" : { 
+            "PATH" : "$PATH:/usr/local/sbin:/usr/local/bin:/usr/bin:/usr/share/perl6/site/bin:/usr/share/perl6/vendor/bin/"
+         }
+       }
+  },
+  {
+     "plugin" : "bash",
+     "task" : "clone git of sparky for web",
+     "data" :
+       {
+         "command" : "git clone https://github.com/melezhik/sparky /opt/sparky"
+       }
+  },
+  {
+     "plugin" : "bash",
+     "task" : "prepare Sparky",
+     "data" :
+       {
+         "command" : "perl6 /opt/sparky/db-init.pl6 --root=/srv/sparky/projects",
+         "envvars" : {
+            "PATH" : "/usr/local/sbin:/usr/local/bin:/usr/bin:/usr/share/perl6/site/bin:/usr/share/perl6/vendor/bin/"
+         }
+       }
+  },
+  {
+     "plugin" : "service",
+     "task" : "enable sparky service",
+     "data" :
+       {
+         "service" : "sparkyd",
+         "action" : "enable"
+       }
+  },
+  {
+     "plugin" : "service",
+     "task" : "enable sparky-web service",
+     "data" :
+       {
+         "service" : "sparky-web",
+         "action" : "enable"
+       }
+  }
+]

@@ -1,0 +1,129 @@
+{
+    "variables": {
+        "iso_url": "https://mirror.yandex.ru/archlinux/iso/latest/archlinux-2017.12.01-x86_64.iso",
+        "iso_checksum_url": "https://mirror.yandex.ru/archlinux/iso/latest/sha1sums.txt",
+        "iso_checksum_type": "sha1",
+        "ssh_timeout": "20m",
+        "headless": "true",
+        "environment_vars": "PATH=/usr/local/bin:/usr/bin:/usr/bin/site_perl:/usr/bin/core_perl",
+        "version": "0.0.23-1",
+        "cloud_token": "{{env `VAGRANT_CLOUD_TOKEN`}}"
+    },
+    "builders": [
+        {
+            "type": "virtualbox-iso",
+            "iso_url": "{{ user `iso_url` }}",
+            "iso_checksum_url": "{{ user `iso_checksum_url` }}",
+            "iso_checksum_type": "{{ user `iso_checksum_type` }}",
+            "guest_os_type": "ArchLinux_64",
+            "guest_additions_mode": "disable",
+            "http_directory": "srv",
+            "boot_wait": "5s",
+            "shutdown_command": "sudo systemctl isolate poweroff.target",
+            "boot_command": [
+              "<enter><wait10><wait10>",
+              "echo root:vagrant | chpasswd<enter>",
+              "systemctl start sshd<enter>"
+            ],
+            "disk_size": 35433,
+            "hard_drive_interface": "sata",
+            "ssh_username": "root",
+            "ssh_password": "vagrant",
+            "ssh_timeout": "{{ user `ssh_timeout` }}",
+            "headless" : "{{ user `headless`}}",
+            "vboxmanage": [
+              ["modifyvm", "{{.Name}}", "--memory", "2048"]
+            ]
+        }
+    ],
+    "provisioners": [
+        {
+            "type": "shell",
+            "script": "scripts/install_sparrow.sh",
+            "execute_command": "chmod +x {{ .Path }}; {{ .Vars }} {{ .Path }} --with_remount",
+            "environment_vars": "{{ user `environment_vars` }}"
+        },
+        {
+            "type": "shell",
+            "execute_command": "{{ .Vars }} sparrow box run {{ .Path }}",
+            "environment_vars": "{{ user `environment_vars` }}",
+            "script": "boxes/install-base.json"
+        },
+        {
+            "type": "shell",
+            "script": "scripts/hack_ssh.sh"
+        },
+        {
+            "type": "shell",
+            "expect_disconnect": true,
+            "inline": "/usr/bin/reboot",
+            "pause_before": "20s"
+        },
+        {
+            "type": "shell",
+            "script": "scripts/install_sparrow.sh",
+            "pause_before": "20s",
+            "environment_vars": "{{ user `environment_vars` }}"
+        },
+        {
+            "type": "file",
+            "source": "files/sudo_vagrant",
+            "destination": "/etc/sudoers.d/vagrant"
+        },
+        {
+            "type": "file",
+            "source": "files/profile",
+            "destination": "/etc/profile"
+        },
+        {
+            "type": "file",
+            "source": "files/sparkyd.service",
+            "destination": "/etc/systemd/system/sparkyd.service"
+        },
+        {
+            "type": "file",
+            "source": "files/sparky-web.service",
+            "destination": "/etc/systemd/system/sparky-web.service"
+        },
+        {
+            "type": "shell",
+            "execute_command": "{{ .Vars }} sparrow box run {{ .Path }}",
+            "environment_vars": "{{ user `environment_vars` }}",
+            "script": "boxes/provise.json"
+        },
+        {
+            "type": "shell",
+            "execute_command": "{{ .Vars }} sparrow box run {{ .Path }}",
+            "environment_vars": "{{ user `environment_vars` }}",
+            "script": "boxes/additional_packages.json"
+        },
+        {
+            "type": "shell",
+            "execute_command": "{{ .Vars }} sparrow box run {{ .Path }}",
+            "environment_vars": "{{ user `environment_vars` }}",
+            "script": "boxes/manage_sparky.json"
+        },
+        {
+            "type": "shell",
+            "execute_command": "{{ .Vars }} sparrow box run {{ .Path }}",
+            "environment_vars": "{{ user `environment_vars` }}",
+            "script": "boxes/clean.json"
+        }
+	],
+    "post-processors": [
+    [
+      {
+        "type": "vagrant",
+        "output": "archlinux-{{ .Provider }}.box",
+        "compression_level": "9"
+      },
+      {
+        "type": "vagrant-cloud",
+        "box_tag": "spigell/sparky",
+        "access_token": "{{user `cloud_token` }}",
+        "version": "{{ user `version` }}",
+        "no_release": true
+      }
+    ]
+  ]
+}

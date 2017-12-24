@@ -1,0 +1,10 @@
+[
+  {
+     "plugin" : "package-generic",
+     "task" : "install additional packages",
+     "data" :
+       {
+         "list" : "docker docker-compose git"
+       }
+  }
+]

@@ -6,8 +6,8 @@ After=network.target
 [Service]
 Type=simple
 ExecStart=/usr/bin/bash -c "cd /opt/sparky && export SPARKY_ROOT=/srv/sparky/projects ; BAILADOR=host:0.0.0.0 perl6 bin/sparky-web.pl6"
-Restart=on-abort
-MemoryLimit=500M
+Restart=always
+MemoryLimit=512M
 
 [Install]
 WantedBy=multi-user.target

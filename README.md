@@ -8,7 +8,7 @@ Supported providers:
 Contains:
   - base packages
   - gcc
-  - sparrow (and some additional perl modules)
+  - sparrow (and some additional perl modules), git
   - makepkg, yaourt
   - sparrowdo
   - sparky
@@ -38,6 +38,8 @@ Or you can use [sshfs](https://github.com/dustymabe/vagrant-sshfs) plugin.
 1) Specify this box in Vagrantfile (spigell/sparky)
 
 2) Put your scenarios and sparky.yml in `/srv/sparky/projects` directory.
+
+3) See results in http://localhost:3000 
 
 ## Services
 

@@ -35,6 +35,17 @@
   },
   {
      "plugin" : "bash",
+     "task" : "install Sparky plugin",
+     "data" :
+       {
+         "command" : "zef install --/test --debug Sparky::Plugin::Notify::Telegram",
+         "envvars" : { 
+            "PATH" : "$PATH:/usr/local/sbin:/usr/local/bin:/usr/bin:/usr/share/perl6/site/bin:/usr/share/perl6/vendor/bin/"
+         }
+       }
+  },
+  {
+     "plugin" : "bash",
      "task" : "clone git of sparky for web",
      "data" :
        {
